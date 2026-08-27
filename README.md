@@ -21,16 +21,14 @@ Shortcuts:
 
 - `1` = Space
 - `2` = Backspace
-- `0` = Space
-- `.` = Backspace
 - `Esc` = quit the program
 
 ## Running the Python Program
 
-Requires Python and Windows. Install the dependency:
+Requires Python and Windows. The `keyboard` package must be installed:
 
 ```bash
-pip install -r requirements.txt
+pip install keyboard
 ```
 
 Run with:

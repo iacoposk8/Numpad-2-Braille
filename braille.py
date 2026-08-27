@@ -42,12 +42,11 @@ BRAILLE_MAP = {
 }
 
 NUMPAD_SCANCODES = {
-    71: '7', 72: '8', 75: '4', 76: '5', 79: '1', 80: '2',
-    82: '0', 83: '.'
+    71: '7', 72: '8', 75: '4', 76: '5', 79: '1', 80: '2'
 }
 BRAILLE_KEYS = {'7', '8', '4', '5', '1', '2'}
 
-# Shortcuts on the six Braille keys (no need to move fingers to 0 or .)
+# Shortcuts on the six Braille keys.
 SPECIAL_CHORDS = {
     frozenset({'1'}): 'space',
     frozenset({'2'}): 'backspace',
@@ -101,8 +100,8 @@ def get_numpad_key(event):
         return NUMPAD_SCANCODES[event.scan_code]
     if getattr(event, 'is_keypad', False):
         name = str(event.name).lower().replace('num ', '').replace('numpad ', '')
-        if name in ('7', '8', '4', '5', '1', '2', '0', '.', 'decimal', 'del', 'delete'):
-            return '.' if name in ('.', 'decimal', 'del', 'delete') else name
+        if name in ('7', '8', '4', '5', '1', '2'):
+            return name
     return None
 
 def handle_keyboard_event(event):
@@ -112,18 +111,6 @@ def handle_keyboard_event(event):
     # Let regular main keyboard keys pass through.
     if key is None:
         return True
-
-    # Keypad 0 = Space
-    if key == '0':
-        if event.event_type == 'up':
-            keyboard.write(' ')
-        return False
-
-    # Keypad . = Backspace
-    if key == '.':
-        if event.event_type == 'up':
-            keyboard.send('backspace')
-        return False
 
     # Braille keys (7, 8, 4, 5, 1, 2)
     if key in BRAILLE_KEYS:
@@ -161,8 +148,7 @@ def main():
     print("Shortcuts:")
     print("  1  ==>  Space")
     print("  2  ==>  Backspace")
-    print("  Keypad 0  ==>  Space")
-    print("  Keypad .  ==>  Backspace\n")
+    print()
 
     hook = keyboard.hook(handle_keyboard_event, suppress=True)
     try:
