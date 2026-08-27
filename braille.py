@@ -2,9 +2,9 @@ import keyboard
 import threading
 import sys
 
-# Mappatura completa Braille a 6 punti -> Caratteri
+# Complete six-dot Braille mapping -> Characters
 BRAILLE_MAP = {
-    # Alfabeto base (a-z)
+    # Basic alphabet (a-z)
     frozenset({'7'}): 'a',
     frozenset({'7', '4'}): 'b',
     frozenset({'7', '8'}): 'c',
@@ -32,7 +32,7 @@ BRAILLE_MAP = {
     frozenset({'7', '1', '8', '5', '2'}): 'y',
     frozenset({'7', '1', '5', '2'}): 'z',
     
-    # Vocali accentate italiane
+    # Italian accented vowels
     frozenset({'7', '4', '1', '5', '2'}): 'à',
     frozenset({'4', '1', '8', '2'}): 'è',
     frozenset({'7', '4', '1', '8', '2'}): 'é',
@@ -47,7 +47,7 @@ NUMPAD_SCANCODES = {
 }
 BRAILLE_KEYS = {'7', '8', '4', '5', '1', '2'}
 
-# Scorciatoie sul blocco dei 6 tasti braille (evitano di spostare le dita su 0/.)
+# Shortcuts on the six Braille keys (no need to move fingers to 0 or .)
 SPECIAL_CHORDS = {
     frozenset({'1'}): 'space',
     frozenset({'2'}): 'backspace',
@@ -58,7 +58,7 @@ current_chord = set()
 chord_timer = None
 commit_lock = threading.Lock()
 
-# Finestra di tolleranza in secondi (80 ms: ideale per la sincronizzazione manuale)
+# Tolerance window in seconds (80 ms: ideal for manual synchronization)
 GRACE_PERIOD = 0.08
 
 def commit_chord():
@@ -73,20 +73,20 @@ def commit_chord():
         if chord in SPECIAL_CHORDS:
             action = SPECIAL_CHORDS[chord]
             if action == 'space':
-                print(f"\n[OK] Tasti rilevati: {detected}  ==>  Spazio")
+                print(f"\n[OK] Detected keys: {detected}  ==>  Space")
                 keyboard.write(' ')
             elif action == 'backspace':
-                print(f"\n[OK] Tasti rilevati: {detected}  ==>  Backspace")
+                print(f"\n[OK] Detected keys: {detected}  ==>  Backspace")
                 keyboard.send('backspace')
         elif chord in BRAILLE_MAP:
             char = BRAILLE_MAP[chord]
-            print(f"\n[OK] Tasti rilevati: {detected}  ==>  Scritto: '{char}'")
+            print(f"\n[OK] Detected keys: {detected}  ==>  Written: '{char}'")
             keyboard.write(char)
         else:
-            print(f"\n[!] Combinazione non mappata: {detected}")
+            print(f"\n[!] Unmapped combination: {detected}")
 
 def restart_release_timer():
-    """Avvia o riavvia il timer di rilascio se un dito arriva o si alza."""
+    """Start or restart the release timer when a finger lands or lifts."""
     global chord_timer
     if chord_timer is not None:
         chord_timer.cancel()
@@ -95,8 +95,8 @@ def restart_release_timer():
     chord_timer.start()
 
 def get_numpad_key(event):
-    # Lo stesso scan code identifica anche frecce, Home/End e Delete
-    # quando arriva dalla tastiera principale. Controlla quindi che sia keypad.
+    # The same scan code can identify arrows, Home/End, and Delete on the
+    # main keyboard. Make sure the event actually comes from the keypad.
     if getattr(event, 'is_keypad', False) and event.scan_code in NUMPAD_SCANCODES:
         return NUMPAD_SCANCODES[event.scan_code]
     if getattr(event, 'is_keypad', False):
@@ -109,32 +109,32 @@ def handle_keyboard_event(event):
     global chord_timer
     key = get_numpad_key(event)
     
-    # Lascia passare i tasti normali della tastiera principale
+    # Let regular main keyboard keys pass through.
     if key is None:
         return True
 
-    # 0 sul tastierino = Spazio
+    # Keypad 0 = Space
     if key == '0':
         if event.event_type == 'up':
             keyboard.write(' ')
         return False
 
-    # . sul tastierino = Cancella (Backspace)
+    # Keypad . = Backspace
     if key == '.':
         if event.event_type == 'up':
             keyboard.send('backspace')
         return False
 
-    # Tasti Braille (7, 8, 4, 5, 1, 2)
+    # Braille keys (7, 8, 4, 5, 1, 2)
     if key in BRAILLE_KEYS:
         if event.event_type == 'down':
             if key in pressed_keys:
-                return False  # Ignora l'auto-repeat di Windows se tenuto premuto
+                return False  # Ignore Windows auto-repeat when held down.
             
             pressed_keys.add(key)
             current_chord.add(key)
             
-            # Se un tasto ritardatario atterra mentre il timer stava per scattare, resetta il timer
+            # Reset the timer if a late key arrives while it is about to fire.
             if chord_timer is not None and chord_timer.is_alive():
                 restart_release_timer()
 
@@ -144,7 +144,7 @@ def handle_keyboard_event(event):
         elif event.event_type == 'up':
             pressed_keys.discard(key)
             
-            # Non appena comincia la fase di rilascio, avvia la finestra di tolleranza di 80ms
+            # Start the 80 ms tolerance window as soon as release begins.
             if current_chord:
                 restart_release_timer()
 
@@ -154,15 +154,15 @@ def handle_keyboard_event(event):
 
 def main():
     print("=" * 60)
-    print("      TASTIERA BRAILLE NUMPAD (Tolleranza 80ms)")
+    print("      BRAILLE NUMPAD KEYBOARD (80 ms tolerance)")
     print("=" * 60)
-    print("- Scrivi liberamente in Word, Chrome, Blocco Note, ecc.")
-    print("- Premi 'Esc' per uscire dal programma.\n")
-    print("Scorciatoie:")
-    print("  1  ==>  Spazio")
+    print("- Type freely in Word, Chrome, Notepad, etc.")
+    print("- Press 'Esc' to exit the program.\n")
+    print("Shortcuts:")
+    print("  1  ==>  Space")
     print("  2  ==>  Backspace")
-    print("  Tasto numpad 0  ==>  Spazio")
-    print("  Tasto numpad .  ==>  Backspace\n")
+    print("  Keypad 0  ==>  Space")
+    print("  Keypad .  ==>  Backspace\n")
 
     hook = keyboard.hook(handle_keyboard_event, suppress=True)
     try:
@@ -171,7 +171,7 @@ def main():
         if chord_timer is not None:
             chord_timer.cancel()
         keyboard.unhook(hook)
-        print("\nProgramma terminato.")
+        print("\nProgram terminated.")
 
 if __name__ == '__main__':
     main()

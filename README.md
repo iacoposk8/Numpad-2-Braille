@@ -1,14 +1,14 @@
 # Braille Numpad
 
-Strumento per scrivere ed esercitarsi con il Braille a 6 punti usando il tastierino numerico.
+A tool for writing and practicing six-dot Braille using the numeric keypad.
 
-## Componenti
+## Components
 
-- `braille.py`: intercetta gli accordi Braille e scrive il carattere nell’applicazione attiva.
+- `braille.py`: detects Braille chords and writes the character into the active application.
 
-## Mappatura del tastierino
+## Keypad Mapping
 
-| Tasto | Punto Braille |
+| Key | Braille dot |
 |---|---:|
 | 7 | 1 |
 | 4 | 2 |
@@ -17,32 +17,30 @@ Strumento per scrivere ed esercitarsi con il Braille a 6 punti usando il tastier
 | 5 | 5 |
 | 2 | 6 |
 
-Scorciatoie:
+Shortcuts:
 
-- `1` = spazio
+- `1` = Space
 - `2` = Backspace
-- `0` = spazio
+- `0` = Space
 - `.` = Backspace
-- `Esc` = termina il programma
+- `Esc` = quit the program
 
-## Avvio del programma Python
+## Running the Python Program
 
-Richiede Python e Windows. Installare la dipendenza:
+Requires Python and Windows. Install the dependency:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Avviare con:
+Run with:
 
 ```bash
 python braille.py
 ```
 
-In alternativa, su Windows è possibile usare `avvia_braille.bat`.
+The program uses a global keyboard hook. Run it only when Braille input is needed.
 
-Il programma usa un hook globale della tastiera: avviarlo solo quando si desidera attivare la scrittura Braille.
+## License
 
-## Licenza
-
-Nessuna licenza è stata ancora definita.
+No license has been defined yet.
