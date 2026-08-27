@@ -38,7 +38,3 @@ python braille.py
 ```
 
 The program uses a global keyboard hook. Run it only when Braille input is needed.
-
-## License
-
-No license has been defined yet.
