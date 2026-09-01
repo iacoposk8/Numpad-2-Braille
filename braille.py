@@ -66,7 +66,7 @@ numbers_active = False
 
 # Tolerance window in seconds (80 ms: ideal for manual synchronization)
 GRACE_PERIOD = 0.08
-DOUBLE_CLICK_WINDOW = 0.60
+DOUBLE_CLICK_WINDOW = 0.30
 
 NUMBER_MAP = {chr(ord('a') + index): str(index + 1) for index in range(26)}
 
@@ -136,7 +136,7 @@ def commit_chord():
                 output = output.upper()
             print(f"\n[OK] Detected keys: {detected}  ==>  Written: '{output}'")
             if ctrl_active:
-                keyboard.hotkey('ctrl', char)
+                keyboard.send(f'ctrl+{char}')
             else:
                 keyboard.write(output)
         else:
