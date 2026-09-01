@@ -21,7 +21,15 @@ Shortcuts:
 
 - `1` = Space
 - `2` = Backspace
+- `4` = toggle Ctrl (the key above `1`/Space)
+- Double-click `4` = toggle Caps Lock
+- Double-click `1` = Enter
+- Double-click `2` = toggle numbers: `a` = `1`, `b` = `2`, ..., `z` = `26`
 - `Esc` = quit the program
+
+Ctrl is a toggle. Press `4`, enter a Braille letter, and the program sends the
+corresponding Ctrl shortcut, such as `Ctrl+F`. Press `4` again to release Ctrl.
+The Ctrl key still acts as Braille dot 2 when it is part of a multi-key chord.
 
 ## Running the Python Program
 

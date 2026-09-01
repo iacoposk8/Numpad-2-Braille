@@ -1,6 +1,7 @@
 import keyboard
 import threading
 import sys
+import time
 
 # Complete six-dot Braille mapping -> Characters
 BRAILLE_MAP = {
@@ -50,15 +51,71 @@ BRAILLE_KEYS = {'7', '8', '4', '5', '1', '2'}
 SPECIAL_CHORDS = {
     frozenset({'1'}): 'space',
     frozenset({'2'}): 'backspace',
+    frozenset({'4'}): 'ctrl',
 }
 
 pressed_keys = set()
 current_chord = set()
 chord_timer = None
 commit_lock = threading.Lock()
+single_action_timers = {}
+last_click_times = {}
+ctrl_active = False
+caps_lock_active = False
+numbers_active = False
 
 # Tolerance window in seconds (80 ms: ideal for manual synchronization)
 GRACE_PERIOD = 0.08
+DOUBLE_CLICK_WINDOW = 0.35
+
+NUMBER_MAP = {chr(ord('a') + index): str(index + 1) for index in range(26)}
+
+def perform_single_action(action):
+    global ctrl_active, numbers_active
+    if action == 'space':
+        keyboard.write(' ')
+    elif action == 'backspace':
+        keyboard.send('backspace')
+    elif action == 'ctrl':
+        ctrl_active = not ctrl_active
+        print(f"\n[MODE] Ctrl {'active' if ctrl_active else 'released'}")
+
+def perform_double_action(action):
+    global caps_lock_active, numbers_active, ctrl_active
+    if action == 'ctrl':
+        caps_lock_active = not caps_lock_active
+        ctrl_active = False
+        print(f"\n[MODE] Caps Lock {'active' if caps_lock_active else 'released'}")
+    elif action == 'space':
+        keyboard.send('enter')
+    elif action == 'backspace':
+        numbers_active = not numbers_active
+        print(f"\n[MODE] Numbers {'active' if numbers_active else 'released'}")
+
+def handle_special_action(action, detected):
+    """Delay single-key actions long enough to recognize a double click."""
+    now = time.monotonic()
+    previous = last_click_times.get(action, 0)
+    pending = single_action_timers.get(action)
+    if now - previous <= DOUBLE_CLICK_WINDOW:
+        if pending is not None:
+            pending.cancel()
+        single_action_timers.pop(action, None)
+        last_click_times.pop(action, None)
+        print(f"\n[OK] Detected keys: {detected}  ==>  Double-click: {action}")
+        perform_double_action(action)
+        return
+
+    last_click_times[action] = now
+    print(f"\n[OK] Detected keys: {detected}  ==>  {action.title()}")
+    if action == 'ctrl':
+        # Ctrl must be available immediately for the following Braille chord.
+        perform_single_action(action)
+        return
+    timer = threading.Timer(DOUBLE_CLICK_WINDOW, perform_single_action, args=(action,))
+    timer.daemon = True
+    single_action_timers[action] = timer
+    timer.start()
 
 def commit_chord():
     global current_chord
@@ -71,16 +128,19 @@ def commit_chord():
 
         if chord in SPECIAL_CHORDS:
             action = SPECIAL_CHORDS[chord]
-            if action == 'space':
-                print(f"\n[OK] Detected keys: {detected}  ==>  Space")
-                keyboard.write(' ')
-            elif action == 'backspace':
-                print(f"\n[OK] Detected keys: {detected}  ==>  Backspace")
-                keyboard.send('backspace')
+            handle_special_action(action, detected)
         elif chord in BRAILLE_MAP:
             char = BRAILLE_MAP[chord]
-            print(f"\n[OK] Detected keys: {detected}  ==>  Written: '{char}'")
-            keyboard.write(char)
+            output = NUMBER_MAP.get(char, char) if numbers_active else char
+            if caps_lock_active and output.isalpha():
+                output = output.upper()
+            print(f"\n[OK] Detected keys: {detected}  ==>  Written: '{output}'")
+            if ctrl_active:
+                keyboard.press('ctrl')
+                keyboard.write(char)
+                keyboard.release('ctrl')
+            else:
+                keyboard.write(output)
         else:
             print(f"\n[!] Unmapped combination: {detected}")
 
@@ -144,10 +204,14 @@ def main():
     print("      BRAILLE NUMPAD KEYBOARD (80 ms tolerance)")
     print("=" * 60)
     print("- Type freely in Word, Chrome, Notepad, etc.")
-    print("- Press 'Esc' to exit the program.\n")
+    print("- Press 'Esc' to exit the program.")
+    print("- Key 4 (above Space) is a toggle Ctrl key.")
+    print("- Double-click 4 for Caps Lock; double-click 1 for Enter.")
+    print("- Double-click 2 to toggle numbers (a=1, b=2, ..., z=26).\n")
     print("Shortcuts:")
     print("  1  ==>  Space")
     print("  2  ==>  Backspace")
+    print("  4  ==>  Toggle Ctrl")
     print()
 
     hook = keyboard.hook(handle_keyboard_event, suppress=True)
@@ -156,6 +220,8 @@ def main():
     finally:
         if chord_timer is not None:
             chord_timer.cancel()
+        for timer in single_action_timers.values():
+            timer.cancel()
         keyboard.unhook(hook)
         print("\nProgram terminated.")
 
