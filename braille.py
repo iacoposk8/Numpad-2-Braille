@@ -1,4 +1,5 @@
 import keyboard
+import argparse
 import threading
 import sys
 import time
@@ -45,7 +46,30 @@ BRAILLE_MAP = {
 NUMPAD_SCANCODES = {
     71: '7', 72: '8', 75: '4', 76: '5', 79: '1', 80: '2'
 }
-BRAILLE_KEYS = {'7', '8', '4', '5', '1', '2'}
+INPUT_MODES = {
+    'normal': {
+        'label': 'Normal numpad',
+        'keys': {'7': {'7'}, '4': {'4'}, '1': {'1'},
+                 '8': {'8'}, '5': {'5'}, '2': {'2'}},
+    },
+    'reverse': {
+        'label': 'Reverse numpad (rotated 180 degrees)',
+        'keys': {'1': {'7'}, '4': {'4'}, '8': {'1'},
+                 '2': {'8'}, '5': {'5'}, '7': {'2'}},
+    },
+    'one-hand': {
+        'label': 'One-hand keyboard (AWEDXC)',
+        'keys': {'w': {'7'}, 'a': {'4'}, 'x': {'1'},
+                 'e': {'8'}, 'd': {'5'}, 'c': {'1', '2'}},
+    },
+    'inline': {
+        'label': 'Inline keyboard (QWERXC)',
+        'keys': {'w': {'7'}, 'q': {'4'}, 'x': {'1'},
+                 'e': {'8'}, 'r': {'5'}, 'c': {'1', '2'}},
+    },
+}
+
+active_mode = 'normal'
 
 # Shortcuts on the six Braille keys.
 SPECIAL_CHORDS = {
@@ -162,28 +186,34 @@ def get_numpad_key(event):
             return name
     return None
 
+def get_input_key(event):
+    """Return the physical key used by the selected input mode."""
+    if active_mode in ('normal', 'reverse'):
+        return get_numpad_key(event)
+    key = str(event.name).lower()
+    return key if key in INPUT_MODES[active_mode]['keys'] else None
+
 def handle_keyboard_event(event):
     global chord_timer
-    key = get_numpad_key(event)
+    key = get_input_key(event)
     
     # Let regular main keyboard keys pass through.
     if key is None:
         return True
 
-    # Braille keys (7, 8, 4, 5, 1, 2)
-    if key in BRAILLE_KEYS:
+    if key in INPUT_MODES[active_mode]['keys']:
         if event.event_type == 'down':
             if key in pressed_keys:
                 return False  # Ignore Windows auto-repeat when held down.
             
             pressed_keys.add(key)
-            current_chord.add(key)
+            current_chord.update(INPUT_MODES[active_mode]['keys'][key])
             
             # Reset the timer if a late key arrives while it is about to fire.
             if chord_timer is not None and chord_timer.is_alive():
                 restart_release_timer()
 
-            sys.stdout.write(f"\r[Live Monitor] Dita sui tasti: {sorted(list(pressed_keys))}       ")
+            sys.stdout.write(f"\r[Live Monitor] Fingers on keys: {sorted(list(pressed_keys))}       ")
             sys.stdout.flush()
 
         elif event.event_type == 'up':
@@ -197,19 +227,47 @@ def handle_keyboard_event(event):
 
     return True
 
+def choose_mode(requested_mode=None):
+    """Choose an input layout from the command line or an interactive menu."""
+    if requested_mode:
+        return requested_mode
+    print("Choose an input mode:")
+    mode_names = list(INPUT_MODES)
+    for index, mode_name in enumerate(mode_names, 1):
+        print(f"  {index}) {INPUT_MODES[mode_name]['label']}")
+    while True:
+        choice = input("Mode [1]: ").strip() or '1'
+        if choice.isdigit() and 1 <= int(choice) <= len(mode_names):
+            return mode_names[int(choice) - 1]
+        print("Please enter a number from 1 to 4.")
+
+def key_for_chord(chord):
+    """Return the single physical key assigned to a canonical chord, if any."""
+    return next((key for key, value in INPUT_MODES[active_mode]['keys'].items()
+                 if value == set(chord)), None)
+
 def main():
+    global active_mode
+    parser = argparse.ArgumentParser(description='Type six-dot Braille chords with different keyboard layouts.')
+    parser.add_argument('-m', '--mode', choices=INPUT_MODES, help='skip the interactive mode menu')
+    args = parser.parse_args()
+    active_mode = choose_mode(args.mode)
+
     print("=" * 60)
-    print("      BRAILLE NUMPAD KEYBOARD (80 ms tolerance)")
+    print("      BRAILLE KEYBOARD (80 ms tolerance)")
     print("=" * 60)
+    print(f"- Input mode: {INPUT_MODES[active_mode]['label']}")
     print("- Type freely in Word, Chrome, Notepad, etc.")
     print("- Press 'Esc' to exit the program.")
-    print("- Key 4 (above Space) is a toggle Ctrl key.")
-    print("- Double-click 4 for Caps Lock; double-click 1 for Enter.")
-    print("- Double-click 2 to toggle numbers (a=1, b=2, ..., z=26).\n")
-    print("Shortcuts:")
-    print("  1  ==>  Space")
-    print("  2  ==>  Backspace")
-    print("  4  ==>  Toggle Ctrl")
+    space_key = key_for_chord({'1'})
+    backspace_key = key_for_chord({'2'})
+    ctrl_key = key_for_chord({'4'})
+    print(f"- {ctrl_key}: toggle Ctrl; double-click: Caps Lock.")
+    print(f"- {space_key}: Space; double-click: Enter.")
+    if backspace_key:
+        print(f"- {backspace_key}: Backspace; double-click: number mode.")
+    else:
+        print("- Use regular Backspace (the number-mode shortcut is unavailable in this layout).")
     print()
 
     hook = keyboard.hook(handle_keyboard_event, suppress=True)
