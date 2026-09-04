@@ -24,18 +24,19 @@ The program asks which layout to use at startup. You can also pass it with
 
 ### Reverse numpad
 
-For a 3x2 macro keyboard rotated 180 degrees:
+For a 3x2 macro keyboard rotated 180 degrees around the X axis. This flips
+the top and bottom rows while keeping the left and right columns in place:
 
 | Key | Braille dot |
 |---|---:|
 | 1 | 1 |
 | 4 | 2 |
-| 8 | 3 |
+| 7 | 3 |
 | 2 | 4 |
 | 5 | 5 |
-| 7 | 6 |
+| 8 | 6 |
 
-Examples: `D` = `125`; `Z` = `5817`.
+Examples: `D` = `1+2+5`; `Z` = `1+5+7+8`.
 
 ### One-hand keyboard
 
@@ -47,17 +48,25 @@ together. Examples: `D` = `WED`; `Z` = `CDW`.
 Uses `W`, `Q`, `X`, `E`, `R` for dots 1–5. `C` enters dots 3 and 6
 together. Examples: `D` = `WER`; `Z` = `CRW`.
 
-Shortcuts use the single keys assigned to dots 3, 6, and 2. In normal mode
-these are `1` = Space, `2` = Backspace, and `4` = toggle Ctrl. In reverse
-mode they are `8`, `7`, and `4` respectively. Double-click Space for Enter,
-Ctrl for Caps Lock, or Backspace for number mode (`a` = `1`, ..., `z` = `26`).
+## Shortcuts
+
+Shortcuts use the single keys assigned to dots 3, 6, and 2:
+
+| Mode | Space | Backspace | Toggle Ctrl |
+|---|---|---|---|
+| Normal numpad | `1` | `2` | `4` |
+| Reverse numpad | `7` | `8` | `4` |
+| One-hand keyboard | `X` | regular Backspace | `A` |
+| Inline keyboard | `X` | regular Backspace | `Q` |
+
+Double-click Space for Enter, Ctrl for Caps Lock, or Backspace for number mode
+(`a` = `1`, ..., `z` = `26`). Number mode is available in the numpad modes;
+the alphabetic modes use the regular Backspace key.
 - `Esc` = quit the program
 
 Ctrl is a toggle. Press its layout key, enter a Braille letter, and the program
 sends the corresponding shortcut, such as `Ctrl+F`. Press it again to release Ctrl.
 The Ctrl key still acts as Braille dot 2 when it is part of a multi-key chord.
-In the alphabetic keyboard modes, use the regular Backspace key; `X` is Space
-and `A` (one-hand) or `Q` (inline) toggles Ctrl.
 
 ## Running the Python Program
 

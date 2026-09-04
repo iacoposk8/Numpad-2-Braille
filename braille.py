@@ -53,9 +53,9 @@ INPUT_MODES = {
                  '8': {'8'}, '5': {'5'}, '2': {'2'}},
     },
     'reverse': {
-        'label': 'Reverse numpad (rotated 180 degrees)',
-        'keys': {'1': {'7'}, '4': {'4'}, '8': {'1'},
-                 '2': {'8'}, '5': {'5'}, '7': {'2'}},
+        'label': 'Reverse numpad (rotated 180 degrees around the X axis)',
+        'keys': {'1': {'7'}, '4': {'4'}, '7': {'1'},
+                 '2': {'8'}, '5': {'5'}, '8': {'2'}},
     },
     'one-hand': {
         'label': 'One-hand keyboard (AWEDXC)',
