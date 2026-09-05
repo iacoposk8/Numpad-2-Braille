@@ -40,13 +40,15 @@ Examples: `D` = `1+2+5`; `Z` = `1+5+7+8`.
 
 ### One-hand keyboard
 
-Uses `W`, `A`, `C`, `E`, `F`, `V` for dots 1–6 respectively.
-Examples: `D` = `WEF`; `Z` = `WCFV`.
+Uses `W`, `A`, `C`, `E`, `F` for dots 1–5. `V` supplies dots 3+6,
+or dot 6 alone for the letter `W`. Examples: `D` = `WEF`, `U` = `WV`,
+`W` = `EAFV`, and `Z` = `WFV`.
 
 ### Inline keyboard
 
-Uses `W`, `Q`, `C`, `E`, `R`, `V` for dots 1–6 respectively.
-Examples: `D` = `WER`; `Z` = `WCRV`.
+Uses `W`, `Q`, `C`, `E`, `R` for dots 1–5. `V` supplies dots 3+6,
+or dot 6 alone for the letter `W`. Examples: `D` = `WER`, `U` = `WV`,
+`W` = `EQRV`, and `Z` = `WRV`.
 
 ## Shortcuts
 
@@ -56,8 +58,8 @@ Shortcuts use the single keys assigned to dots 3, 6, and 2:
 |---|---|---|---|
 | Normal numpad | `1` | `2` | `4` |
 | Reverse numpad | `7` | `8` | `4` |
-| One-hand keyboard | `C` | `V` | `A` |
-| Inline keyboard | `C` | `V` | `Q` |
+| One-hand keyboard | `C` | regular Backspace | `A` |
+| Inline keyboard | `C` | regular Backspace | `Q` |
 
 Double-click Space for Enter, Ctrl for Caps Lock, or Backspace for number mode
 (`a` = `1`, ..., `z` = `26`).

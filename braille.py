@@ -60,12 +60,12 @@ INPUT_MODES = {
     'one-hand': {
         'label': 'One-hand keyboard (AWEFCV)',
         'keys': {'w': {'7'}, 'a': {'4'}, 'c': {'1'},
-                 'e': {'8'}, 'f': {'5'}, 'v': {'2'}},
+                 'e': {'8'}, 'f': {'5'}, 'v': {'1', '2'}},
     },
     'inline': {
         'label': 'Inline keyboard (QWERCV)',
         'keys': {'w': {'7'}, 'q': {'4'}, 'c': {'1'},
-                 'e': {'8'}, 'r': {'5'}, 'v': {'2'}},
+                 'e': {'8'}, 'r': {'5'}, 'v': {'1', '2'}},
     },
 }
 
@@ -80,6 +80,7 @@ SPECIAL_CHORDS = {
 
 pressed_keys = set()
 current_chord = set()
+current_input_keys = set()
 chord_timer = None
 commit_lock = threading.Lock()
 single_action_timers = {}
@@ -147,8 +148,17 @@ def commit_chord():
         if not current_chord:
             return
         chord = frozenset(current_chord)
+        input_keys = frozenset(current_input_keys)
         detected = sorted(list(current_chord))
         current_chord.clear()
+        current_input_keys.clear()
+
+        # V normally supplies dots 3+6. The letter W is the one six-dot
+        # letter containing dot 6 without dot 3, so E/Q/R/V (or E/A/F/V)
+        # treats V as dot 6 only.
+        if active_mode in ('one-hand', 'inline') and 'v' in input_keys and 'c' not in input_keys:
+            if chord == frozenset({'4', '1', '8', '5', '2'}):
+                chord = frozenset({'4', '8', '5', '2'})
 
         if chord in SPECIAL_CHORDS:
             action = SPECIAL_CHORDS[chord]
@@ -207,6 +217,7 @@ def handle_keyboard_event(event):
                 return False  # Ignore Windows auto-repeat when held down.
             
             pressed_keys.add(key)
+            current_input_keys.add(key)
             current_chord.update(INPUT_MODES[active_mode]['keys'][key])
             
             # Reset the timer if a late key arrives while it is about to fire.
