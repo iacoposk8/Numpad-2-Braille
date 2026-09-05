@@ -58,14 +58,14 @@ INPUT_MODES = {
                  '2': {'8'}, '5': {'5'}, '8': {'2'}},
     },
     'one-hand': {
-        'label': 'One-hand keyboard (AWEDXC)',
-        'keys': {'w': {'7'}, 'a': {'4'}, 'x': {'1'},
-                 'e': {'8'}, 'd': {'5'}, 'c': {'1', '2'}},
+        'label': 'One-hand keyboard (AWEFCV)',
+        'keys': {'w': {'7'}, 'a': {'4'}, 'c': {'1'},
+                 'e': {'8'}, 'f': {'5'}, 'v': {'2'}},
     },
     'inline': {
-        'label': 'Inline keyboard (QWERXC)',
-        'keys': {'w': {'7'}, 'q': {'4'}, 'x': {'1'},
-                 'e': {'8'}, 'r': {'5'}, 'c': {'1', '2'}},
+        'label': 'Inline keyboard (QWERCV)',
+        'keys': {'w': {'7'}, 'q': {'4'}, 'c': {'1'},
+                 'e': {'8'}, 'r': {'5'}, 'v': {'2'}},
     },
 }
 

@@ -40,13 +40,13 @@ Examples: `D` = `1+2+5`; `Z` = `1+5+7+8`.
 
 ### One-hand keyboard
 
-Uses `W`, `A`, `X`, `E`, `D` for dots 1–5. `C` enters dots 3 and 6
-together. Examples: `D` = `WED`; `Z` = `CDW`.
+Uses `W`, `A`, `C`, `E`, `F`, `V` for dots 1–6 respectively.
+Examples: `D` = `WEF`; `Z` = `WCFV`.
 
 ### Inline keyboard
 
-Uses `W`, `Q`, `X`, `E`, `R` for dots 1–5. `C` enters dots 3 and 6
-together. Examples: `D` = `WER`; `Z` = `CRW`.
+Uses `W`, `Q`, `C`, `E`, `R`, `V` for dots 1–6 respectively.
+Examples: `D` = `WER`; `Z` = `WCRV`.
 
 ## Shortcuts
 
@@ -56,12 +56,11 @@ Shortcuts use the single keys assigned to dots 3, 6, and 2:
 |---|---|---|---|
 | Normal numpad | `1` | `2` | `4` |
 | Reverse numpad | `7` | `8` | `4` |
-| One-hand keyboard | `X` | regular Backspace | `A` |
-| Inline keyboard | `X` | regular Backspace | `Q` |
+| One-hand keyboard | `C` | `V` | `A` |
+| Inline keyboard | `C` | `V` | `Q` |
 
 Double-click Space for Enter, Ctrl for Caps Lock, or Backspace for number mode
-(`a` = `1`, ..., `z` = `26`). Number mode is available in the numpad modes;
-the alphabetic modes use the regular Backspace key.
+(`a` = `1`, ..., `z` = `26`).
 - `Esc` = quit the program
 
 Ctrl is a toggle. Press its layout key, enter a Braille letter, and the program
